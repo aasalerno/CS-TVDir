@@ -33,10 +33,10 @@ end
 Nr = size(r);
 
 % Make a vector that gives us Ir - Iq for all r and give us A
-Aleft = zeros(Nr(2),Nr(1),N(1));
+Ahat = zeros(Nr(2),Nr(1),N(1));
 for i = 1:length(q)
     for j = 1:Nr(1)
-        A(j,:) = r(j,:,i) - q(i);
+        A(j,:) = r(j,:,i) - q(i,:);
         
         % Give us the required left side to make the proper term for beta
         % Irq = A*B
@@ -44,9 +44,23 @@ for i = 1:length(q)
         % (A' * A)^-1 * A' * Irq =
         
     end
-    Aleft(:,:,i) = (A'*A)\A';
+    Ahat(:,:,i) = (A'*A)\A';
 end
 
-dirInfo.Aleft = Aleft;
+%[~,y] = meshgrid(1:size(inds,2),1:size(inds,1));
+inds = inds(:,2:ncons+1); % Only take the indicies that we care about
+Ninds = numel(inds); % Count how many there are
+
+for kk = 1:N(1)
+    indsPos{kk} = kk:N(1):Ninds;
+    indsNeg{kk} = find(inds == kk)';
+end
+
+    
+%dirPairs = cat(3,y,inds);
+
+dirInfo.Ahat = Ahat;
 dirInfo.r = r;
-dirInfo.inds = inds(:,2:ncons+1);
+dirInfo.inds = inds;
+dirInfo.indsPos = indsPos;
+dirInfo.indsNeg = indsNeg;
