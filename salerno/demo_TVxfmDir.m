@@ -2,8 +2,9 @@ function [im_res,diffRMS] = demo_TVxfmDir(TVWeight,xfmWeight,dirWeight)
 
 % Load in the data
 load brain.6-zpad-ksp.mat
-% dat_share = 'data_added_nearest.mat';
-% load(dat_share);
+dat_share = 'data_added_nearest.mat';
+load(dat_share);
+load('sampPattern.mat');
 origDataSize = [180 180];
 
 
