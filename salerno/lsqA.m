@@ -64,3 +64,4 @@ dirInfo.r = r;
 dirInfo.inds = inds;
 dirInfo.indsPos = indsPos;
 dirInfo.indsNeg = indsNeg;
+dirInfo.combs = combnk(1:length(dirs),2);
