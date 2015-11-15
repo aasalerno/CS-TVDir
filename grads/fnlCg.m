@@ -34,6 +34,20 @@ t = 1;
 %     g0(:,:,kk) = wGradient(x(:,:,kk),params);
 % end
 
+if isfield(params,'dirWeight') && params.dirWeight ~= 0
+    dDirx = zeros([size(x,1) size(x,2) size(params.dirInfo.inds)]);
+    
+    for i = 1:size(params.dirInfo.inds,1)
+        for j = 1:size(params.dirInfo.inds,2)
+            dDirx(:,:,i,j) = params.XFM'*(x(:,:,params.dirInfo.inds(i,j))-x(:,:,i));
+        end
+    end
+    
+    
+    
+end
+
+
 g0 = wGradient(x,params);
 dx = -g0;
 %test = 0;
@@ -74,9 +88,9 @@ while(1)
         t0 = t0 / beta;
     end
     
-%     x1 = x(:,:,1);
-%     save(['/projects/muisjes/asalerno/CS/data/dirArtefactData/x_grad.' num2str(cntX) '.mat'],'x1');
-%     cntX = cntX +1;
+    %     x1 = x(:,:,1);
+    %     save(['/projects/muisjes/asalerno/CS/data/dirArtefactData/x_grad.' num2str(cntX) '.mat'],'x1');
+    %     cntX = cntX +1;
     x = (x + t*dx);
     
     
@@ -97,13 +111,13 @@ while(1)
     if (k > params.Itnlim) | (norm(dx(:))/numel(dx) < gradToll)
         break;
     else
-   %     toc
-   %     disp(num2str(norm(dx(:))/numel(dx)));
-   %     test = test+1;
+        %     toc
+        %     disp(num2str(norm(dx(:))/numel(dx)));
+        %     test = test+1;
     end
-%     imshow(params.XFM'*x(:,:,1));
-%     pause(0.1)
-
+    %     imshow(params.XFM'*x(:,:,1));
+    %     pause(0.1)
+    
 end
 
 
