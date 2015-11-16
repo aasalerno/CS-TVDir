@@ -52,8 +52,8 @@ inds = inds(:,2:ncons+1); % Only take the indicies that we care about
 Ninds = numel(inds); % Count how many there are
 
 for kk = 1:N(1)
-    indsPos{kk} = kk:N(1):Ninds;
-    indsNeg{kk} = find(inds == kk)';
+    [indsNeg{kk}(:,1), indsNeg{kk}(:,2)] = ind2sub(size(inds),kk:N(1):Ninds);
+    [indsPos{kk}(:,1), indsPos{kk}(:,2)] = find(inds == kk);
 end
 
     
