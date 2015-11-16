@@ -17,6 +17,7 @@ for i = 1:N(3)
 end
 
 DN = [N(1) N(2)];
+Itnlim = 8;		% Number of iterations
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Direction Recon Parameters
@@ -45,7 +46,6 @@ end
 % doesn't exist already
 if ~exist('samp','var')
     pctg = 0.25;  	% undersampling factor
-    Itnlim = 8;		% Number of iterations
     radius = 0.2;
     disp('Creating sampling pattern');
     samp = genSampToAdd(DN,pctg,radius,threshAcc+1,filename);
@@ -91,6 +91,7 @@ end
 
 
 % initialize Parameters for reconstruction
+param = init;
 param.FT = trans.FT;
 param.XFM = XFM;
 param.TV = TVOP;
