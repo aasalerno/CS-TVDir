@@ -1,4 +1,4 @@
-function grad = gTV(x,params,dDirx)
+function [grad,param] = gTV(x,param)
 % compute gradient of TV operator
 %
 % Edited from the original to also include the information from the
@@ -8,7 +8,7 @@ function grad = gTV(x,params,dDirx)
 % compares the gradient term and the directional term -- it will be
 % dirWeight/TVWeight
 
-p = params.pNorm;
+p = param.pNorm;
 
 
 grad = zeros(size(x));
@@ -16,52 +16,45 @@ grad = zeros(size(x));
 for kk = 1:size(x,3)
     % TV
     x1 = squeeze(x(:,:,kk));
-    Dx = params.TV*(params.XFM'*x1);
-    G = p*Dx.*(Dx.*conj(Dx) + params.l1Smooth).^(p/2-1);
-    grad(:,:,kk) = (params.TV'*G);
+    Dx = param.TV*(param.XFM'*x1);
+    G = p*Dx.*(Dx.*conj(Dx) + param.l1Smooth).^(p/2-1);
+    grad(:,:,kk) = (param.TV'*G);
 end
 
-if params.dirWeight
-    Ahat = params.dirInfo.Ahat;
-    inds = params.dirInfo.inds;
-    indsPos = params.dirInfo.indsPos;
+if param.dirWeight
+    %     Ahat = params.dirInfo.Ahat;
+    M = param.dirInfo.M;
+    Ause = param.dirInfo.Ause;
+    dI = param.dirInfo.dI;
+    dDirx = param.dDirx;
+    %inds = params.dirInfo.inds;
+    %indsPos = params.dirInfo.indsPos;
     %indsNeg = params.dirInfo.indsNeg;
+    
     % Preallocate for speed and having recursive addition
     gradHold = zeros(size(x));
-    betaHold = zeros([size(x) 3])
+    %     betaHold = zeros([size(x) 3]);
     
     for kk = 1:size(x,3)
-
-        
-        % Have the work done with respect to addition (when it's the
-        % positive term in the calculation)
-%         for i = 1:numel(indsPos{kk})
-%             gradHold(:,:,i) = gradHold(:,:,i) + x(:,:,kk) - x(:,:,inds(indsPos{kk}(i)));
-%         end
-        
-        % Have the calculations done for the negative sets. My only worry
-        % with this part is that this will lead to a total cancellation for
-        % the ones that are closest together -- does this part need to
-        % exist?
-%         for i = 1:numel(indsNeg{kk})
-%             gradHold(:,:,i) = gradHold(:,:,i) +x(:,:,inds(indsNeg{kk}(i))) - x(:,:,kk);
-%         end
-        [rows,cols] = find(inds == kk);
-
-        for i = 1:size(x,1)
-            for j = 1:size(x,2)
-                
-                gradHold(i,j,kk,:) = gradHold(i,j,kk,:) - reshape(Ahat(:,:,kk)*squeeze())
-                
+       
+        for d = 1:length(Ause{kk})
+            colUse = Ause{kk}(d); % Which column are we looking at 
+            dIM = dI(:,colUse,kk)'*M(:,:,colUse); % dI(:,d,kk) gives the d'th column in the kk'th set -- that is it tells us the column of where the image from direction kk shows up
+            for i = 1:size(x,1)
+                for j = 1:size(x,2)
+                    
+                    gradHold(i,j,kk) = gradHold(i,j,kk) + 2*dIM*dDirx(:, colUse, i,j); % Pixel i,j in our dataset, all of the differences (column), for column d which is told to us by the above
+                    
+                end
             end
         end
-        
-        
+       
         
     end
     grad = grad + gradHold;
+    param.gDir = gradHold;
 end
 
 for kk = 1:size(x,3)
-    grad(:,:,kk) = params.XFM*grad(:,:,kk);
+    grad(:,:,kk) = param.XFM*grad(:,:,kk);
 end

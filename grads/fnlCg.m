@@ -1,4 +1,4 @@
-function x = fnlCg(x,params)
+function x = fnlCg(x,param)
 %-----------------------------------------------------------------------
 %
 % res = fnlCg(x0,params)
@@ -20,11 +20,11 @@ function x = fnlCg(x,params)
 %-------------------------------------------------------------------------
 
 % line search parameters
-maxlsiter = params.lineSearchItnlim ;
-gradToll = params.gradToll ;
-alpha = params.lineSearchAlpha;
-beta = params.lineSearchBeta;
-t0 = params.lineSearchT0;
+maxlsiter = param.lineSearchItnlim ;
+gradToll = param.gradToll ;
+alpha = param.lineSearchAlpha;
+beta = param.lineSearchBeta;
+t0 = param.lineSearchT0;
 k = 0;
 t = 1;
 
@@ -34,21 +34,7 @@ t = 1;
 %     g0(:,:,kk) = wGradient(x(:,:,kk),params);
 % end
 
-if isfield(params,'dirWeight') && params.dirWeight ~= 0
-    dDirx = zeros([size(x,1) size(x,2) size(params.dirInfo.inds)]);
-    
-    for i = 1:size(params.dirInfo.inds,1)
-        for j = 1:size(params.dirInfo.inds,2)
-            dDirx(:,:,i,j) = params.XFM'*(x(:,:,params.dirInfo.inds(i,j))-x(:,:,i));
-        end
-    end
-    
-    
-    
-end
-
-
-g0 = wGradient(x,params);
+[g0,param] = wGradient(x,param);
 dx = -g0;
 %test = 0;
 % iterations
@@ -58,17 +44,17 @@ while(1)
     
     % pre-calculate values, such that it would be cheap to compute the objective
     % many times for efficient line-search
-    [FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx, XFMtx, XFMtdx] = preobjective(x, dx, params);
-    f0 = objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx, XFMtx, XFMtdx, x,dx, 0, params);
+    [FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx, XFMtx, XFMtdx] = preobjective(x, dx, param);
+    f0 = objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx, XFMtx, XFMtdx, x,dx, 0, param);
     t = t0;
-    [f1, ERRobj, RMSerr]  =  objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx, XFMtx, XFMtdx, x,dx, t, params);
+    [f1, ERRobj, RMSerr]  =  objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx, XFMtx, XFMtdx, x,dx, t, param);
     
     lsiter = 0;
     
     while (f1 > f0 - alpha*t*abs(g0(:)'*dx(:))) & (lsiter<maxlsiter)
         lsiter = lsiter + 1;
         t = t * beta;
-        [f1, ERRobj, RMSerr]  =  objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx,XFMtx, XFMtdx,x,dx, t, params);
+        [f1, ERRobj, RMSerr]  =  objective(FTXFMtx, FTXFMtdx, DXFMtx, DXFMtdx,XFMtx, XFMtdx,x,dx, t, param);
         if abs(f1/f0 - 1) < 1e-2
             break;
         end
@@ -101,14 +87,14 @@ while(1)
     
     %conjugate gradient calculation
     
-    g1 = wGradient(x,params);
+    [g1,param] = wGradient(x,param);
     bk = g1(:)'*g1(:)/(g0(:)'*g0(:)+eps);
     g0 = g1;
     dx =  - g1 + bk* dx;
     k = k + 1;
     
     %TODO: need to "think" of a "better" stopping criteria ;-)
-    if (k > params.Itnlim) | (norm(dx(:))/numel(dx) < gradToll)
+    if (k > param.Itnlim) | (norm(dx(:))/numel(dx) < gradToll)
         break;
     else
         %     toc

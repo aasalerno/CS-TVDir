@@ -1,4 +1,4 @@
-function [im_res,diffRMS] = demo_TVxfmDir(TVWeight,xfmWeight,dirWeight)
+function [im_res,diffRMS] = demo_TVxfmDir(TVWeight,xfmWeight,dirWeight,threshAcc)
 
 % Load in the data
 load brain.6-zpad-ksp.mat
@@ -23,7 +23,9 @@ Itnlim = 8;		% Number of iterations
 % Direction Recon Parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 filename = '/micehome/asalerno/Documents/CompressedSensing/GradientVectorMag.txt'; % Vector file
-threshAcc = 4;
+if nargin < 4
+    threshAcc = 4;
+end
 
 % Check to make sure that the number of directions is the same as number of
 % slices (one per direction) in our stack!
@@ -36,6 +38,7 @@ end
 param = init;
 if dirWeight
     dirInfo = lsqA(filename,threshAcc);
+    param.dirInfo = dirInfo;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -91,7 +94,6 @@ end
 
 
 % initialize Parameters for reconstruction
-param = init;
 param.FT = trans.FT;
 param.XFM = XFM;
 param.TV = TVOP;
@@ -99,7 +101,6 @@ param.data = data;
 param.TVWeight =TVWeight;     % TV penalty
 param.xfmWeight = xfmWeight;  % L1 wavelet penalty
 param.dirWeight = dirWeight;  % directional weight
-param.dirInfo = dirInfo;
 param.Itnlim = Itnlim;
 
 steps = zeros([size(res) 8]);
@@ -114,7 +115,7 @@ for n=1:8
 %     subplot(2,4,n)
 %     imshow(abs(im_hold),[])
 end
-
+toc
 for i=N(3):-1:1
     im_res(:,:,i) = XFM'*res(:,:,i);
 end
@@ -123,4 +124,4 @@ end
 diffRMS = rms(im(:)-im_res(:));
 
 
-%mat2mnc(abs(im_res),['/home/asalerno/Desktop/10.23.15/data_shared_far.mnc'])
+mat2mnc(abs(im_res),['/projects/egerek/asalerno/CS-TVDir/TV' num2str(TVWeight) 'DIR' num2str(dirWeight) 'XFM' num2str(XFMWeight) '.mnc'])

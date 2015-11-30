@@ -34,6 +34,7 @@ Nr = size(r);
 
 % Make a vector that gives us Ir - Iq for all r and give us A
 Ahat = zeros(Nr(2),Nr(1),N(1));
+M = zeros(Nr(1),Nr(1),N(1));
 for i = 1:length(q)
     for j = 1:Nr(1)
         A(j,:) = r(j,:,i) - q(i,:);
@@ -45,23 +46,41 @@ for i = 1:length(q)
         
     end
     Ahat(:,:,i) = (A'*A)\A';
+    M(:,:,i) = Ahat(:,:,i)'*Ahat(:,:,i);
 end
 
 %[~,y] = meshgrid(1:size(inds,2),1:size(inds,1));
 inds = inds(:,2:ncons+1); % Only take the indicies that we care about
 Ninds = numel(inds); % Count how many there are
 
+indsNeg = cell(30,1);
+indsPos = cell(30,1);
 for kk = 1:N(1)
-    [indsNeg{kk}(:,1), indsNeg{kk}(:,2)] = ind2sub(size(inds),kk:N(1):Ninds);
-    [indsPos{kk}(:,1), indsPos{kk}(:,2)] = find(inds == kk);
+    indsNeg{kk} = kk:N(1):Ninds;
+    indsPos{kk} = find(inds == kk);
 end
 
+dI = zeros(ncons,N(1),N(1));
+Ause = cell(30,1);
+for kk = 1:N(1)
+%     dI(indsNeg{kk}(:,1),indsNeg{kk}(:,2),kk) = -inds(indsNeg{kk}(:,1),indsNeg{kk}(:,2)); % Negative because these values are subtracted in the original eqn
+%     dI(indsPos{kk}(:,1),indsPos{kk}(:,2),kk) = inds(indsPos{kk}(:,1),indsPos{kk}(:,2)); % Positive because these ones are the proper matrix
+    dIHold = zeros(N(1),ncons);
+    dIHold(indsNeg{kk}) = -1;
+    dIHold(indsPos{kk}) = 1;
+    dI(:,:,kk) = dIHold';
+    Ause{kk} = find(any(dIHold~=0,2));
+end
+    
     
 %dirPairs = cat(3,y,inds);
 
 dirInfo.Ahat = Ahat;
+dirInfo.M = M;
 dirInfo.r = r;
 dirInfo.inds = inds;
 dirInfo.indsPos = indsPos;
 dirInfo.indsNeg = indsNeg;
 dirInfo.combs = combnk(1:length(dirs),2);
+dirInfo.dI = dI;
+dirInfo.Ause = Ause;
