@@ -56,7 +56,7 @@ if ~exist('samp','var')
 end
 
 %generate transform operator
-XFM = Wavelet('Daubechies',10,4);	% Wavelet
+XFM = Wavelet('Daubechies',20,4);	% Wavelet
 
 
 
@@ -124,4 +124,4 @@ end
 diffRMS = rms(im(:)-im_res(:));
 
 
-mat2mnc(abs(im_res),['/projects/egerek/asalerno/CS-TVDir/TV' num2str(TVWeight) 'DIR' num2str(dirWeight) 'XFM' num2str(XFMWeight) '.mnc'])
+mat2mnc(abs(im_res),['/projects/egerek/asalerno/CS-TVDir/TV' num2str(TVWeight) 'DIR' num2str(dirWeight) 'XFM' num2str(xfmWeight) '.mnc'])

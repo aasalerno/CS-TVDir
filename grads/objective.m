@@ -26,9 +26,10 @@ if param.TVWeight
     %         TV(:,kk) = (w.*conj(w)+params.l1Smooth).^(p/2);
     %     end
     w = reshape(DXFMtx + t*DXFMtdx,[N(1)*N(2)*2,N(3)]);
-    dir = reshape(XFMtx + t*param.gDir,[N(1)*N(2),N(3)]);
+   
     if param.dirWeight
-        TV = (sum(w(:).*conj(w(:))+param.l1Smooth) + param.dirWeight.*(sum(dir(:).*conj(dir(:))))/(sum(cellfun('prodofsize', param.dirInfo.Ause)))).^(p/2);
+        dir = reshape(XFMtx + t*param.gDir,[N(1)*N(2),N(3)]);
+        TV = (0*sum(w(:).*conj(w(:))+param.l1Smooth) + param.dirWeight.*(sum(dir(:).*conj(dir(:))))/(sum(cellfun('prodofsize', param.dirInfo.Ause)))).^(p/2);
     else
         TV = (w.*conj(w)+param.l1Smooth).^(p/2);
     end
@@ -44,7 +45,8 @@ if param.xfmWeight
     %         w = x1(:) + t*dx1(:);
     %         XFM(:,kk) = (w.*conj(w)+params.l1Smooth).^(p/2);
     %     end
-    w = reshape(x + t*dx,[N(1)*N(2),N(3)]);
+    %w = reshape(x + t*dx,[N(1)*N(2),N(3)]);
+    w = x(:) + t*dx(:);
     XFM = (w.*conj(w)+param.l1Smooth).^(p/2);
 else
     XFM=0;
