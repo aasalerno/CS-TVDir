@@ -9,6 +9,12 @@ if param.xfmWeight
     gradXFM = gXFM(x,param);
 end
 
+
+% Here, we build a matrix of differences for each of the combinations that
+% we get in the indicies.
+%
+% It's a bit slow, as we need to do all 30 directions amd there are ~4 sets
+% each. So it overall takes about a second after some cleaning up.
 if isfield(param,'dirWeight') && param.dirWeight ~= 0
     dDirx = zeros([size(x,1) size(x,2) size(param.dirInfo.inds)]);
     
@@ -20,9 +26,6 @@ if isfield(param,'dirWeight') && param.dirWeight ~= 0
     
     param.dDirx = permute(dDirx,[4 3 1 2]); % Put it such that it will produce a column matrix for :,columnWeNeed,i,j
     
-    for i = 1:size(x,3)
-        
-    end
 end
 
 if param.TVWeight
