@@ -61,6 +61,7 @@ for kk = 1:N(1)
 end
 
 dI = zeros(ncons,N(1),N(1));
+dIM = dI;
 Ause = cell(30,1);
 for kk = 1:N(1)
     %     dI(indsNeg{kk}(:,1),indsNeg{kk}(:,2),kk) = -inds(indsNeg{kk}(:,1),indsNeg{kk}(:,2)); % Negative because these values are subtracted in the original eqn
@@ -72,7 +73,7 @@ for kk = 1:N(1)
     Ause{kk} = find(any(dIHold~=0,2));
     for d = 1:length(Ause{kk})
         colUse = Ause{kk}(d); % Which column are we looking at
-        dIM = dI(:,colUse,kk)'*M(:,:,colUse);
+        dIM(:,colUse,kk) = dI(:,colUse,kk)'*M(:,:,colUse);
     end
 end
 
