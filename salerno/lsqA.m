@@ -63,16 +63,23 @@ end
 dI = zeros(ncons,N(1),N(1));
 Ause = cell(30,1);
 for kk = 1:N(1)
-%     dI(indsNeg{kk}(:,1),indsNeg{kk}(:,2),kk) = -inds(indsNeg{kk}(:,1),indsNeg{kk}(:,2)); % Negative because these values are subtracted in the original eqn
-%     dI(indsPos{kk}(:,1),indsPos{kk}(:,2),kk) = inds(indsPos{kk}(:,1),indsPos{kk}(:,2)); % Positive because these ones are the proper matrix
+    %     dI(indsNeg{kk}(:,1),indsNeg{kk}(:,2),kk) = -inds(indsNeg{kk}(:,1),indsNeg{kk}(:,2)); % Negative because these values are subtracted in the original eqn
+    %     dI(indsPos{kk}(:,1),indsPos{kk}(:,2),kk) = inds(indsPos{kk}(:,1),indsPos{kk}(:,2)); % Positive because these ones are the proper matrix
     dIHold = zeros(N(1),ncons);
     dIHold(indsNeg{kk}) = -1;
     dIHold(indsPos{kk}) = 1;
     dI(:,:,kk) = dIHold';
     Ause{kk} = find(any(dIHold~=0,2));
+    for d = 1:length(Ause{kk})
+        colUse = Ause{kk}(d); % Which column are we looking at
+        dIM = dI(:,colUse,kk)'*M(:,:,colUse);
+    end
 end
-    
-    
+
+
+
+
+
 %dirPairs = cat(3,y,inds);
 
 dirInfo.Ahat = Ahat;
@@ -84,3 +91,4 @@ dirInfo.indsNeg = indsNeg;
 dirInfo.combs = combnk(1:length(dirs),2);
 dirInfo.dI = dI;
 dirInfo.Ause = Ause;
+dirInfo.dIM = dIM;
