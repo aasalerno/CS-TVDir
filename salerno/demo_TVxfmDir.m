@@ -2,6 +2,7 @@ function [im_res,diffRMS] = demo_TVxfmDir(TVWeight,xfmWeight,dirWeight,threshAcc
 
 % Load in the data
 load brain.6-zpad-ksp.mat
+%load brain6.1-zpad-ksp.mat
 dat_share = 'data_added_nearest.mat';
 load(dat_share);
 load('sampPattern.mat');
@@ -81,6 +82,10 @@ for kk=1:N(3)
 end
 
 % Now we add the k-space data together to create im_dc
+% a = load('brain.6-zpad-ksp.mat');
+% for i = 30:-1:1
+%     a.data(:,:,i) = ifft2c(a.im(:,:,i));
+% end
 data_dc = ksp_add(samp,data,filename,origDataSize,threshAcc+1,1);
 im_dc = zeros(N);
 res = zeros(N);
@@ -103,12 +108,12 @@ param.xfmWeight = xfmWeight;  % L1 wavelet penalty
 param.dirWeight = dirWeight;  % directional weight
 param.Itnlim = Itnlim;
 
-steps = zeros([size(res) 8]);
+steps = zeros([size(res) 2]);
 tic
-for n=1:8
+for n=1:2
     res = fnlCg(res,param);
     n
-    steps(:,:,:,n) = res;
+%    steps(:,:,:,n) = res;
 % 	im_hold = XFM'*res(:,:,1);
 % % 	%figure(100), imshow(abs(im_res),[]), drawnow
 %     figure(3)
@@ -124,4 +129,4 @@ end
 diffRMS = rms(im(:)-im_res(:));
 
 
-mat2mnc(abs(im_res),['/projects/egerek/asalerno/CS-TVDir/TV' num2str(TVWeight) 'DIR' num2str(dirWeight) 'XFM' num2str(xfmWeight) '.mnc'])
+mat2mnc(abs(im_res),['/projects/egerek/asalerno/CS-TVDir/onebrain_TV' num2str(TVWeight) 'DIR' num2str(dirWeight) 'XFM' num2str(xfmWeight) '.mnc'])
