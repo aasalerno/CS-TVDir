@@ -37,7 +37,7 @@ if param.dirWeight
             end
         end
         
-        dDirx = permute(dDirx,[4 3 1 2]); % Put it such that it will produce a column matrix for :,columnWeNeed,i,j
+%         dDirx = permute(dDirx,[4 3 1 2]); % Put it such that it will produce a column matrix for :,columnWeNeed,i,j
         
     end
     %     Ahat = params.dirInfo.Ahat;
@@ -57,26 +57,33 @@ if param.dirWeight
         
         % Comb is which "combination" we're looking at -- that is the
         % combinations that are closest to dir
-        for comb = 1:length(Ause{dir})
-            
-            columnOfData = Ause{dir}(comb); % Which column are we looking at
-            
-            % Run through each pixel 
-            for pixel_i = 1:size(x,1)
-                for pixel_j = 1:size(x,2)
-                    
-                    gradHold(pixel_i,pixel_j,dir) = gradHold(pixel_i,pixel_j,dir)...
-                                                   + 2*dIM(columnOfData,:,dir)*dDirx(:, columnOfData, pixel_i,pixel_j); % Pixel i,j in our dataset, all of the differences (column), for column d which is told to us by the above
-                    
-                end
-            end
-        end
+%         for comb = 1:length(Ause{dir})
+%             
+%             columnOfData = Ause{dir}(comb); % Which column are we looking at
+%             
+%             % Run through each pixel 
+%             for pixel_i = 1:size(x,1)
+%                 for pixel_j = 1:size(x,2)
+%                     
+%                     gradHold(pixel_i,pixel_j,dir) = gradHold(pixel_i,pixel_j,dir)...
+%                                                    + 2*dIM(columnOfData,:,dir)*dDirx(:, columnOfData, pixel_i,pixel_j); % Pixel i,j in our dataset, all of the differences (column), for column d which is told to us by the above
+%                     
+%                 end
+%             end
+%         end
         
         % OR %
         
         for comb = 1:length(Ause{dir})
-        
-        
+            
+            columnOfData = Ause{dir}(comb); % Which column are we looking at
+            
+            for qr = 1:size(param.dirInfo.inds,2)
+            
+                gradHold(:,:,dir) = dIM(dir,qr,columnOfData)*dDirx(:,:,dir,qr) + gradHold(:,:,dir);
+            end
+            
+        end
     end
     
     % Add the original gTV and the gTV from our direction term
