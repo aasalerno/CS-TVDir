@@ -25,6 +25,9 @@ r = zpad(r,256,256);
 
 
 % Make a dot product matrix
+if numel(N) == 2
+    N(3) = 1;
+end
 dp = zeros(N(3));
 for i = 1:N(3)
     for j = 1:N(3)
