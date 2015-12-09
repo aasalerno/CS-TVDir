@@ -28,6 +28,7 @@ res.lineSearchItnlim = 150;
 res.lineSearchAlpha = 0.01;
 res.lineSearchBeta = 0.6;
 res.lineSearchT0 = 1 ; % step size to start with
+res.dirWeight = 0;
 
 
 
