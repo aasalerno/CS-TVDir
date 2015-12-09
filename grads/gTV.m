@@ -61,16 +61,20 @@ if param.dirWeight
             
             columnOfData = Ause{dir}(comb); % Which column are we looking at
             
-            % Run through each pixel for the 
+            % Run through each pixel 
             for pixel_i = 1:size(x,1)
                 for pixel_j = 1:size(x,2)
                     
                     gradHold(pixel_i,pixel_j,dir) = gradHold(pixel_i,pixel_j,dir)...
-                                                   + 2*dIM*dDirx(:, columnOfData, pixel_i,pixel_j); % Pixel i,j in our dataset, all of the differences (column), for column d which is told to us by the above
+                                                   + 2*dIM(columnOfData,:,dir)*dDirx(:, columnOfData, pixel_i,pixel_j); % Pixel i,j in our dataset, all of the differences (column), for column d which is told to us by the above
                     
                 end
             end
         end
+        
+        % OR %
+        
+        for comb = 1:length(Ause{dir})
         
         
     end
