@@ -29,7 +29,9 @@ if param.TVWeight
    
     if param.dirWeight
         dir = reshape(XFMtx + t*param.gDir,[N(1)*N(2),N(3)]);
-        TV = (0*sum(w(:).*conj(w(:))+param.l1Smooth) + param.dirWeight.*(sum(dir(:).*conj(dir(:))))/(sum(cellfun('prodofsize', param.dirInfo.Ause)))).^(p/2);
+        TV = (param.TVPixWeight*sum(w(:).*conj(w(:))+param.l1Smooth) + ...
+            param.dirWeight.*...
+            sum(dir(:).*conj(dir(:)))/(sum(cellfun('prodofsize', param.dirInfo.Ause)))).^(p/2);
     else
         TV = (w.*conj(w)+param.l1Smooth).^(p/2);
     end
