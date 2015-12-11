@@ -7,6 +7,11 @@ function [grad,param] = gTV(x,param)
 % The directional term's gradient will be multiplied by a factor that
 % compares the gradient term and the directional term -- it will be
 % dirWeight/TVWeight
+persistent counters
+
+if isempty(counters)
+    counters = 0;
+end
 
 p = param.pNorm;
 
@@ -18,7 +23,7 @@ for dir = 1:size(x,3)
     x1 = squeeze(x(:,:,dir));
     Dx = param.TV*(param.XFM'*x1);
     G = p*Dx.*(Dx.*conj(Dx) + param.l1Smooth).^(p/2-1);
-    grad(:,:,dir) = (param.TV'*G);
+    grad(:,:,dir) = param.TVPixWeight*(param.TV'*G);
 end
 
 if param.dirWeight
@@ -37,7 +42,7 @@ if param.dirWeight
             end
         end
         
-%         dDirx = permute(dDirx,[4 3 1 2]); % Put it such that it will produce a column matrix for :,columnWeNeed,i,j
+        %         dDirx = permute(dDirx,[4 3 1 2]); % Put it such that it will produce a column matrix for :,columnWeNeed,i,j
         
     end
     %     Ahat = params.dirInfo.Ahat;
@@ -52,25 +57,25 @@ if param.dirWeight
     
     % Preallocate for speed and having recursive addition
     gradHold = zeros(size(x));
-        
+    
     for dir = 1:size(x,3)
         
         % Comb is which "combination" we're looking at -- that is the
         % combinations that are closest to dir
-%         for comb = 1:length(Ause{dir})
-%             
-%             columnOfData = Ause{dir}(comb); % Which column are we looking at
-%             
-%             % Run through each pixel 
-%             for pixel_i = 1:size(x,1)
-%                 for pixel_j = 1:size(x,2)
-%                     
-%                     gradHold(pixel_i,pixel_j,dir) = gradHold(pixel_i,pixel_j,dir)...
-%                                                    + 2*dIM(columnOfData,:,dir)*dDirx(:, columnOfData, pixel_i,pixel_j); % Pixel i,j in our dataset, all of the differences (column), for column d which is told to us by the above
-%                     
-%                 end
-%             end
-%         end
+        %         for comb = 1:length(Ause{dir})
+        %
+        %             columnOfData = Ause{dir}(comb); % Which column are we looking at
+        %
+        %             % Run through each pixel
+        %             for pixel_i = 1:size(x,1)
+        %                 for pixel_j = 1:size(x,2)
+        %
+        %                     gradHold(pixel_i,pixel_j,dir) = gradHold(pixel_i,pixel_j,dir)...
+        %                                                    + 2*dIM(columnOfData,:,dir)*dDirx(:, columnOfData, pixel_i,pixel_j); % Pixel i,j in our dataset, all of the differences (column), for column d which is told to us by the above
+        %
+        %                 end
+        %             end
+        %         end
         
         % OR %
         
@@ -79,7 +84,7 @@ if param.dirWeight
             columnOfData = Ause{dir}(comb); % Which column are we looking at
             
             for qr = 1:size(param.dirInfo.inds,2)
-            
+                
                 gradHold(:,:,dir) = dIM(dir,qr,columnOfData)*dDirx(:,:,dir,qr) + gradHold(:,:,dir);
             end
             
@@ -90,8 +95,14 @@ if param.dirWeight
     grad = grad + gradHold;
     
     % Save it for future looking if we want
-    %param.gDir = gradHold;
+    param.gDir = gradHold;
+    counters = counters+1;
+    %save(['./gDir/gDir_' num2str(counters)  '.mat'],'gradHold');
     
-    % Convert it to XFM space
-    grad(:,:,dir) = param.XFM*grad(:,:,dir);
+    
+end
+
+% Convert it to XFM space
+for i = 1:30
+    grad(:,:,i) = param.XFM*grad(:,:,i);
 end
