@@ -16,6 +16,8 @@ res.data = []; % measurements to reconstruct from
 
 res.TVWeight = 0.01;	% TV penalty
 res.xfmWeight = 0.01;   % transform l1 penalty
+res.dirWeight = 0;
+res.TVPixWeight = 1;
 
 res.Itnlim = 20;	% default number of iterations
 res.gradToll = 1e-30;	% step size tollerance stopping criterea (not used)
@@ -28,7 +30,7 @@ res.lineSearchItnlim = 150;
 res.lineSearchAlpha = 0.01;
 res.lineSearchBeta = 0.6;
 res.lineSearchT0 = 1 ; % step size to start with
-res.dirWeight = 0;
+
 
 
 
